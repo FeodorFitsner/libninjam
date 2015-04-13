@@ -1,6 +1,49 @@
 language:       cpp
 compiler:       gcc
 before_install:
+  - VERSION=0.07.001
+  - DEB_DIR=/home/travis/build/libninjam/libninjam/build/debian
+  - PROJECT_NAME=libninjam-full
+  - DEB_PKG="$PROJECT_NAME"_"$VERSION"_amd64.deb
   - sudo apt-get update -qq
   - sudo apt-get install -y libogg-dev libvorbis-dev libasound2-dev libjack-dev
-script:         make
+  - sudo apt-get install -y libncurses5-dev
+  - gem install fpm --no-rdoc --no-ri
+  - gem install package_cloud --no-rdoc --no-ri
+script:         >
+  make install DESTDIR=$DEB_DIR                                                  &&
+  fpm -s dir -t deb --name $PROJECT_NAME --version $VERSION                       \
+    -C              $DEB_DIR/                                                     \
+    --package       "$DEB_DIR/$PROJECT_NAME"_VERSION_ARCH.deb                     \
+    --license       'GPL2+'                                                       \
+    --maintainer    'bill-auger@programmer.net'                                   \
+    --vendor        'https://github.com/libninjam/libninjam'                      \
+    --url           'https://github.com/libninjam/libninjam'                      \
+    --provides      'libninjam-common'                                            \
+    --provides      'libninjam-client'                                            \
+    --provides      'libninjam-common-dev'                                        \
+    --provides      'libninjam-client-dev'                                        \
+    --provides      'ninjam-server'                                               \
+    --provides      'ninjam-client'                                               \
+    --depends       'libvorbis-dev'                                               \
+    --depends       'libogg-dev'                                                  \
+    --depends       'libasound2-dev'                                              \
+    --depends       'libjack-dev'                                                 \
+    --depends       'libncurses5-dev'                                             \
+    --description   'Novel Intervalic Network Jamming Architecture for Musicians
+                    \n\nNINJAM allows musicians to jam together over the internet
+                    in pseudo-realtime.\n\nThis is the common base library
+                    for NINJAM compatible servers and clients.'                   \
+    --deb-changelog $DEB_DIR/changelog                                            \
+    --deb-priority  'optional'                                                    \
+    --category      'sound'                                                       \
+    --replaces      'libninjam-common'                                            \
+    --replaces      'libninjam-client'                                            \
+    --replaces      'libninjam-common-dev'                                        \
+    --replaces      'libninjam-client-dev'                                        \
+    --replaces      'ninjam-server'                                               \
+    --replaces      'ninjam-client'                                               \
+    usr/                                                                         &&
+  echo "deb package built successfully"                                          &&
+  package_cloud yank ninjam/ninjam/ubuntu/trusty          $DEB_PKG               &&
+  package_cloud push ninjam/ninjam/ubuntu/trusty $DEB_DIR/$DEB_PKG

@@ -27,19 +27,10 @@ endif
 #############################################################
 
 # we MUST have -fomit-frame-pointer and -lm, otherwise we hate life
-#CFLAGS = $(OPTFLAGS) -s -Wall -Wextra -Isrc/
-
-
-
-
-
-
-
-
-CFLAGS = $(OPTFLAGS) -s -Isrc/
-# CFLAGS += -Wshadow
 CC=gcc
 CXX=g++
+CFLAGS = $(OPTFLAGS) -s -Wall -Wextra -Isrc/
+# CFLAGS += -Wshadow
 CXXFLAGS = $(CFLAGS)
 
 COMMON_OBJS  = build/obj/WDL/rng.o
@@ -98,6 +89,7 @@ clean:
 	$(MAKE) -C src/server       clean
 
 install: default
+	echo -e "\ninstalling libninjam to $(INSTALLDIR)\n"
 	mkdir   -p                               $(INSTALLDIR)/include/libninjam/ninjam
 	mkdir   -p                               $(INSTALLDIR)/include/libninjam/WDL/jnetlib
 	mkdir   -p                               $(INSTALLDIR)/lib/pkgconfig
