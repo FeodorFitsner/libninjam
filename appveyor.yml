@@ -1,0 +1,5 @@
+build_script:
+- set path=C:\Windows\Microsoft.NET\Framework\v3.5;%path%
+- msbuild build\vc2008\libninjam-static.sln
+
+test: off
